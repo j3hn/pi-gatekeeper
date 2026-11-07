@@ -21,7 +21,7 @@
     "url": "https://github.com/j3hn/pi-gatekeeper/issues"
   },
   "scripts": {
-    "test": "node --test test/"
+    "test": "node --test \"test/**/*.test.ts\""
   },
   "files": [
     "extensions",

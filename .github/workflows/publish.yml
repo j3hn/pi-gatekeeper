@@ -31,7 +31,9 @@ concurrency:
 jobs:
   publish:
     # Trusted publishing does not support self-hosted runners.
-    runs-on: ubuntu-latest
+    # Pinned deliberately: `ubuntu-latest` migrates to Ubuntu 26 from 2026-10-19, and a
+    # runner image change must not be able to break a release.
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
 
@@ -48,6 +50,9 @@ jobs:
 
       - name: Test
         run: npm test
+
+      # Note: `npm run build --if-present` is deliberately absent — there is nothing to build,
+      # the extension is TypeScript that Pi loads directly.
 
       - name: Refuse to publish a version that already exists
         run: |
