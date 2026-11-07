@@ -1,0 +1,125 @@
+<!doctype html>
+<!--
+  Source for assets/demo.png, the pi.dev gallery preview (pi.image).
+  The gallery renders media in a 16:9 box with object-fit: contain, so this is
+  1600x900. Rebuild with:
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+      --headless=new --disable-gpu --hide-scrollbars \
+      --force-device-scale-factor=1 --window-size=1600,900 \
+      --screenshot=assets/demo.png "file://$PWD/assets/card.html"
+  Colours are pi.dev's own dark theme (#0e0e11 background, #ddd text, #aaa dim).
+-->
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { width: 1600px; height: 900px; overflow: hidden; }
+      body {
+        background: #0e0e11;
+        color: #ddd;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        padding: 76px 84px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+      }
+      .glow {
+        position: absolute;
+        inset: -30% -10% auto -10%;
+        height: 900px;
+        background: radial-gradient(closest-side, rgba(101, 160, 255, 0.16), rgba(14, 14, 17, 0));
+        pointer-events: none;
+      }
+      header { position: relative; display: flex; align-items: center; gap: 26px; }
+      .mark { width: 76px; height: 76px; flex: none; }
+      .name { font-size: 74px; letter-spacing: -2px; line-height: 1; }
+      .tag { margin-top: 22px; color: #aaa; font-size: 30px; line-height: 1.35; }
+      .tag b { color: #ddd; font-weight: 600; }
+      .term {
+        position: relative;
+        border: 1px solid #2b2b33;
+        border-radius: 16px;
+        background: #14141a;
+        box-shadow: 0 30px 80px rgba(0, 0, 0, 0.55);
+        overflow: hidden;
+      }
+      .bar {
+        display: flex; align-items: center; gap: 10px;
+        padding: 18px 24px; border-bottom: 1px solid #24242b; background: #17171d;
+      }
+      .dot { width: 13px; height: 13px; border-radius: 50%; }
+      .title { margin-left: 14px; color: #777; font-size: 21px; }
+      .body { padding: 30px 34px 34px; font-size: 32px; line-height: 1.5; }
+      .row { display: flex; gap: 18px; align-items: baseline; white-space: nowrap; }
+      .prompt { color: #777; }
+      .red { color: #ff7b72; }
+      .green { color: #7ee787; }
+      .amber { color: #e3b341; }
+      .dim { color: #8b8b95; }
+      .chip {
+        flex: none; align-self: center;
+        font-size: 20px; letter-spacing: 1px; text-transform: uppercase;
+        color: #65a0ff; border: 1px solid rgba(101, 160, 255, 0.45);
+        background: rgba(101, 160, 255, 0.1);
+        padding: 5px 12px; border-radius: 7px;
+      }
+      .spacer { height: 20px; }
+      footer { position: relative; display: flex; align-items: center; gap: 20px; }
+      .install {
+        color: #ddd; font-size: 27px;
+        border: 1px solid #454545; border-radius: 999px; padding: 16px 30px; background: #15151a;
+      }
+      .install span { color: #777; }
+      .note { color: #777; font-size: 24px; }
+    </style>
+  </head>
+  <body>
+    <div class="glow"></div>
+    <header>
+      <svg class="mark" viewBox="0 0 24 24" fill="none" stroke="#65a0ff" stroke-width="1.6" stroke-linejoin="round">
+        <path d="M12 2.2 20 5.4v6.1c0 5-3.4 8.6-8 10.3-4.6-1.7-8-5.3-8-10.3V5.4z" />
+        <path d="M8.6 12.4 11.2 15l4.4-5.2" stroke="#7ee787" stroke-width="1.8" stroke-linecap="round" />
+      </svg>
+      <div>
+        <div class="name">pi-gatekeeper</div>
+      </div>
+    </header>
+
+    <div class="tag">
+      The agent keeps working until <b>your</b> check passes.<br />
+      Not until it says it is done.
+    </div>
+
+    <div class="term">
+      <div class="bar">
+        <span class="dot" style="background: #ff5f57"></span>
+        <span class="dot" style="background: #febc2e"></span>
+        <span class="dot" style="background: #28c840"></span>
+        <span class="title">~/dev/crunch</span>
+      </div>
+      <div class="body">
+        <div class="row"><span class="prompt">$</span><span class="dim">pnpm check</span></div>
+        <div class="row"><span class="red">×</span><span class="red">4 errors in 2 files</span></div>
+        <div class="spacer"></div>
+        <div class="row">
+          <span class="chip">gate</span>
+          <span>Verification failed (attempt 1) — fix the errors below</span>
+        </div>
+        <div class="spacer"></div>
+        <div class="row">
+          <span class="chip" style="color: #e3b341; border-color: rgba(227, 179, 65, 0.45); background: rgba(227, 179, 65, 0.1)">gate</span>
+          <span class="amber">Same failure ×3 — stop patching, change approach</span>
+        </div>
+        <div class="spacer"></div>
+        <div class="row"><span class="green">✓</span><span class="green">pnpm check — gate passed</span></div>
+      </div>
+    </div>
+
+    <footer>
+      <div class="install"><span>$</span> pi install npm:pi-gatekeeper</div>
+      <div class="note">any command · same-failure detection · opt-in rollback</div>
+    </footer>
+  </body>
+</html>

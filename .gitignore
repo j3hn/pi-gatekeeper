@@ -1,0 +1,13 @@
+.DS_Store
+*.tgz
+
+# Dependencies. The package has no runtime dependencies — only a peerDependency
+# that Pi supplies — so nothing here is part of the package. Note the explicit
+# `files` list in package.json, which is what keeps these out of the tarball.
+node_modules/
+
+# pnpm artefacts from an ad-hoc install of the peer dependency. Publishing uses
+# npm, so these are local noise. Remove these two lines if the repo moves to
+# pnpm as its toolchain and the lockfile should be tracked.
+pnpm-lock.yaml
+pnpm-workspace.yaml

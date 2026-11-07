@@ -1,0 +1,44 @@
+{
+  "name": "pi-gatekeeper",
+  "version": "3.0.1",
+  "description": "Refuses to let a Pi run settle while your executable completion requirement is false, after making the agent define one that is concrete",
+  "type": "module",
+  "keywords": [
+    "pi-package",
+    "pi",
+    "pi-coding-agent",
+    "verification",
+    "gatekeeper"
+  ],
+  "license": "MIT",
+  "author": "John Basham <john@goodjob.dev>",
+  "homepage": "https://github.com/j3hn/pi-gatekeeper#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/j3hn/pi-gatekeeper.git"
+  },
+  "bugs": {
+    "url": "https://github.com/j3hn/pi-gatekeeper/issues"
+  },
+  "scripts": {
+    "test": "node --test test/"
+  },
+  "files": [
+    "extensions",
+    "assets/card.jpg",
+    "assets/demo.png",
+    "assets/card.html",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "pi": {
+    "extensions": [
+      "./extensions/index.ts"
+    ],
+    "image": "https://cdn.jsdelivr.net/npm/pi-gatekeeper@latest/assets/card.jpg"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-coding-agent": "*"
+  }
+}
