@@ -1,19 +1,52 @@
 import assert from "node:assert/strict";
 import { execFileSync, spawnSync } from "node:child_process";
-import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readlinkSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { homedir, tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 const SOURCE = process.env.GATEKEEPER_SOURCE ?? join(dirname(fileURLToPath(import.meta.url)), "..", "extensions", "index.ts");
-const TYPEBOX = "/opt/homebrew/lib/node_modules/@earendil-works/pi-coding-agent/node_modules/typebox";
+/**
+ * The extension imports `typebox`, which Pi supplies at runtime. Tests run the
+ * extension as real Node code, so a copy has to be resolvable: the repo's own
+ * dependency tree (CI, `npm install`) first, then a local Pi installation so the
+ * suite runs on a fresh clone without installing anything.
+ *
+ * Deliberately path-based rather than require.resolve: typebox's "exports" map
+ * does not expose ./package.json, so package.json-based resolution throws.
+ */
+function typeboxCandidates(): string[] {
+  const candidates: string[] = [];
+  if (process.env.GATEKEEPER_TYPEBOX) candidates.push(process.env.GATEKEEPER_TYPEBOX);
+  let dir = dirname(fileURLToPath(import.meta.url));
+  for (let depth = 0; depth < 5; depth++) {
+    candidates.push(join(dir, "node_modules", "typebox"));
+    const parent = dirname(dir);
+    if (parent === dir) break;
+    dir = parent;
+  }
+  candidates.push(
+    "/opt/homebrew/lib/node_modules/@earendil-works/pi-coding-agent/node_modules/typebox",
+    "/usr/local/lib/node_modules/@earendil-works/pi-coding-agent/node_modules/typebox",
+    join(homedir(), ".pi", "agent", "npm", "node_modules", "typebox"),
+  );
+  return candidates;
+}
+
+function resolveTypebox(): string {
+  for (const candidate of typeboxCandidates()) {
+    if (existsSync(join(candidate, "package.json"))) return candidate;
+  }
+  throw new Error("typebox not found. Run `npm install`, or set GATEKEEPER_TYPEBOX to its directory.");
+}
+
 const ROOT = mkdtempSync(join(tmpdir(), "gatekeeper-test-"));
 mkdirSync(join(ROOT, "node_modules"), { recursive: true });
 try {
-  symlinkSync(TYPEBOX, join(ROOT, "node_modules", "typebox"), "dir");
-} catch {
-  /* already linked */
+  symlinkSync(resolveTypebox(), join(ROOT, "node_modules", "typebox"), "dir");
+} catch (error) {
+  if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
 }
 let seq = 0;
 
@@ -136,6 +169,16 @@ async function arm(handlers: Map<string, any>, commands: Map<string, any>, tools
 
 const propose = (tools: Map<string, any>, ctx: any, params: any) =>
   tools.get("gatekeeper_propose_requirement").execute("t1", params, undefined, undefined, ctx);
+
+test("tests resolve typebox from the repo's own tree when it is installed", () => {
+  const local = join(dirname(fileURLToPath(import.meta.url)), "..", "node_modules", "typebox");
+  if (!existsSync(join(local, "package.json"))) return; // no local install, the fallback is in use
+  assert.equal(
+    readlinkSync(join(ROOT, "node_modules", "typebox")),
+    local,
+    "the suite must exercise the same dependency tree CI installs",
+  );
+});
 
 test("the gate is off by default", async () => {
   const dir = repo({ "seed.txt": "seed\n" });

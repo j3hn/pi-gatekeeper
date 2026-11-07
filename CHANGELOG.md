@@ -1,5 +1,22 @@
 # Changelog
 
+## [3.0.2] - 2026-11-07
+
+Release plumbing and packaging only — nothing about how the gate behaves changes.
+
+- **Added:** a GitHub Actions release workflow using npm trusted publishing (OIDC). No long-lived
+  token, no 2FA prompt, and provenance attestations are generated automatically. It refuses to
+  publish a version that is already on the registry, which is the mistake that caused the confusing
+  404s.
+- **Fixed:** `typebox` is imported by the extension but was never declared as a host-provided peer.
+  It is now in `peerDependencies` with `"*"`, matching the convention other Pi packages follow.
+  Pi suppresses peer installation for managed packages, so nothing changes for users.
+- **Added:** exact dev pins for the peers and a committed lockfile, so `npm ci` builds a reproducible
+  tree for tests and CI.
+- **Fixed:** the test suite located `typebox` with `require.resolve`, which cannot resolve it because
+  typebox does not export `./package.json`. It resolves by path now: the repo's own tree first, then a
+  local Pi installation so a fresh clone can run the suite without installing anything.
+
 ## [3.0.1] - 2026-11-07
 
 - **Changed:** the footer status line only exists while the gate is on. An inert gate no longer occupies space

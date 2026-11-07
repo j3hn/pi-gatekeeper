@@ -1,0 +1,62 @@
+name: Publish
+
+# Tokenless publishing via npm trusted publishing (OIDC).
+#
+# One-time setup on npmjs.com → pi-gatekeeper → Settings → Trusted publishing:
+#   Organization or user : j3hn
+#   Repository           : pi-gatekeeper
+#   Workflow filename    : publish.yml
+#   Environment name     : (leave empty)
+#   Allowed actions      : allow "npm publish"
+#
+# The first publish must succeed within 2 days of creating that configuration,
+# or it expires and has to be recreated. Do not set NODE_AUTH_TOKEN here — npm
+# automatically prefers the OIDC token, which is short-lived and workflow-scoped.
+# Provenance attestations are generated automatically for public repos.
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  id-token: write # required for OIDC
+  contents: read
+
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    # Trusted publishing does not support self-hosted runners.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-node@v6
+        with:
+          # The tests run the extension as real Node code, which needs unflagged
+          # TypeScript type stripping (Node 23.6+).
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
+          package-manager-cache: false
+
+      - name: Install
+        run: npm ci
+
+      - name: Test
+        run: npm test
+
+      - name: Refuse to publish a version that already exists
+        run: |
+          name=$(node -p "require('./package.json').name")
+          version=$(node -p "require('./package.json').version")
+          if npm view "$name@$version" version >/dev/null 2>&1; then
+            echo "::error::$name@$version is already on the registry — bump the version in package.json first."
+            exit 1
+          fi
+
+      - name: Publish
+        run: npm publish --access public

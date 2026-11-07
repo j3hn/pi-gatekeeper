@@ -1,6 +1,6 @@
 {
   "name": "pi-gatekeeper",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "Refuses to let a Pi run settle while your executable completion requirement is false, after making the agent define one that is concrete",
   "type": "module",
   "keywords": [
@@ -39,6 +39,11 @@
     "image": "https://cdn.jsdelivr.net/npm/pi-gatekeeper@latest/assets/card.jpg"
   },
   "peerDependencies": {
-    "@earendil-works/pi-coding-agent": "*"
+    "@earendil-works/pi-coding-agent": "*",
+    "typebox": "*"
+  },
+  "devDependencies": {
+    "@earendil-works/pi-coding-agent": "1.5.0",
+    "typebox": "1.3.27"
   }
 }
